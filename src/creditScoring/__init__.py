@@ -7,6 +7,7 @@ historical data.
 """
 
 from .version import __version__
-from .data.loader import *
+from .data.loader import validate_dataframe
 
-__all__ = ['__version__']
+# Que se importa con el import *
+__all__ = ['__version__', 'validate_dataframe']

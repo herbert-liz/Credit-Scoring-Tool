@@ -10,17 +10,15 @@ def load_csv(path: str, **kwargs) -> pd.DataFrame:
     return df
 
 
-def ensure_dataframe(data) -> pd.DataFrame:
+def ensure_dataframe(data):
     """
     Ensure input is a pandas DataFrame.
     """
-    if isinstance(data, pd.DataFrame):
-        return data
-
-    raise TypeError("Input must be a pandas DataFrame")
+    if not isinstance(data, pd.DataFrame):
+        raise TypeError("Input must be a pandas DataFrame")
 
 
-def check_empty(df: pd.DataFrame) -> None:
+def check_empty(df: pd.DataFrame):
     """
     Check if DataFrame is empty.
     """
@@ -28,7 +26,7 @@ def check_empty(df: pd.DataFrame) -> None:
         raise ValueError("DataFrame is empty")
 
 
-def check_duplicate_columns(df: pd.DataFrame) -> None:
+def check_duplicate_columns(df: pd.DataFrame):
     """
     Check for duplicated column names.
     """
@@ -40,9 +38,8 @@ def validate_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
     Run basic validations on dataframe.
     """
-    df = ensure_dataframe(df)
-
+    ensure_dataframe(df)
     check_empty(df)
     check_duplicate_columns(df)
 
-    return df
+    return print("DataFrame is valid")

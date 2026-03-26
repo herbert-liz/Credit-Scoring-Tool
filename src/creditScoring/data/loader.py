@@ -1,5 +1,8 @@
-import pandas as pd
+"""
+Module for loading and validating data for credit scoring.
+"""
 
+import pandas as pd
 
 def load_csv(path: str, **kwargs) -> pd.DataFrame:
     """

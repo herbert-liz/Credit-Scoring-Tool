@@ -61,5 +61,7 @@ class BinningTransformer(BaseEstimator, TransformerMixin):
                     raise ValueError("y is required for monotonic binning")
                 data[col] = monotonic_binning(data[col], y, self.n_bins)
             else:
-                raise ValueError(f"Unsupported binning method: {self.method}")
+                raise ValueError(
+                    f"Unsupported binning method: {self.method}. Supported methods: equal_width, quantile, supervised, monotonic"
+                )
         return data

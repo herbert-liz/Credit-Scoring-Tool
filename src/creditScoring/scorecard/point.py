@@ -17,7 +17,7 @@ def build_scorecard_points(coefficients: pd.Series, woe_tables: dict[str, pd.Dat
             continue
         for _, row in table.iterrows():
             partial_score = -(coef * row["woe"] * scaler.factor) / n_features
-            rows.append({"feature": feature, "bin": row["feature"], "woe": row["woe"], "points": partial_score})
+            rows.append({"feature": feature, "bin_value": row["bin"], "woe": row["woe"], "points": partial_score})
 
     return pd.DataFrame(rows)
 

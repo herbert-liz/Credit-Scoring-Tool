@@ -57,7 +57,9 @@ class CreditScoringPipeline:
             return NeuralNetworkModel(random_state=self.config.get("random_state", 42))
         if model_type == "xgboost":
             return XGBoostModel(random_state=self.config.get("random_state", 42))
-        raise ValueError(f"Unsupported model_type: {model_type}")
+        raise ValueError(
+            f"Unsupported model_type: {model_type}. Supported types: logistic, random_forest, neural_network, xgboost"
+        )
 
     def preprocess(self, X: pd.DataFrame, y: pd.Series | None = None, fit: bool = False) -> pd.DataFrame:
         data = handle_missing_values(

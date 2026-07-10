@@ -38,5 +38,7 @@ class CategoricalEncoder(BaseEstimator, TransformerMixin):
             elif self.method == "frequency":
                 X[col] = X[col].map(mapping).fillna(0.0)
             else:
-                raise ValueError(f"Unsupported encoding method: {self.method}")
+                raise ValueError(
+                    f"Unsupported encoding method: {self.method}. Supported methods: label, onehot, frequency"
+                )
         return X

@@ -7,8 +7,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 def calculate_woe_iv(feature: pd.Series, target: pd.Series, event: int = 1, eps: float = 1e-6):
     """Calculate WOE table and IV for a binned/categorical feature."""
-    df = pd.DataFrame({"feature": feature, "target": target}).dropna()
-    grouped = df.groupby("feature", observed=False)["target"].agg(["count", "sum"])
+    df = pd.DataFrame({"bin": feature, "target": target}).dropna()
+    grouped = df.groupby("bin", observed=False)["target"].agg(["count", "sum"])
     grouped = grouped.rename(columns={"sum": "event_count"})
     grouped["non_event_count"] = grouped["count"] - grouped["event_count"]
 
@@ -45,7 +45,7 @@ class WOETransformer(BaseEstimator, TransformerMixin):
         iv_rows = []
         for col in X.columns:
             table, iv = calculate_woe_iv(X[col], y)
-            mapping = dict(zip(table["feature"], table["woe"]))
+            mapping = dict(zip(table["bin"], table["woe"]))
             self.woe_mappings_[col] = mapping
             iv_rows.append({"feature": col, "iv": iv})
         self.iv_table_ = pd.DataFrame(iv_rows).sort_values("iv", ascending=False).reset_index(drop=True)

@@ -22,7 +22,9 @@ def handle_numeric_missing_values(df: pd.DataFrame, strategy="replace", columns=
     elif strategy == "drop":
         df_copy = df_copy.dropna(subset=cols_to_process)
     else:
-        raise ValueError(f"Unsupported numeric strategy: {strategy}")
+        raise ValueError(
+            f"Unsupported numeric strategy: {strategy}. Supported strategies: mean, median, replace, drop"
+        )
     return df_copy
 
 
@@ -48,7 +50,9 @@ def handle_categorical_missing_values(
     elif strategy == "drop":
         df_copy = df_copy.dropna(subset=cols_to_process)
     else:
-        raise ValueError(f"Unsupported categorical strategy: {strategy}")
+        raise ValueError(
+            f"Unsupported categorical strategy: {strategy}. Supported strategies: mode, constant, drop"
+        )
 
     return df_copy
 

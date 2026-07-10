@@ -8,8 +8,8 @@ def load_csv(path: str, **kwargs) -> pd.DataFrame:
     return pd.read_csv(path, **kwargs)
 
 
-def ensure_dataframe(data) -> None:
-    """Ensure input is a pandas DataFrame."""
+def check_is_dataframe(data) -> None:
+    """Validate input is a pandas DataFrame."""
     if not isinstance(data, pd.DataFrame):
         raise TypeError("Input must be a pandas DataFrame")
 
@@ -28,7 +28,7 @@ def check_duplicate_columns(df: pd.DataFrame) -> None:
 
 def validate_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """Run basic validations on DataFrame and return validated copy."""
-    ensure_dataframe(df)
+    check_is_dataframe(df)
     check_empty(df)
     check_duplicate_columns(df)
     return df

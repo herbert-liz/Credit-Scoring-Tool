@@ -34,6 +34,55 @@ score = pipeline.score(X)
 results = pipeline.evaluate(X, y)
 ```
 
+## Configurar el pipeline sin usar el config por defecto
+
+`CreditScoringPipeline` puede inicializarse de 3 maneras:
+
+1. **Sin parámetros** (usa el config por defecto):
+   ```python
+   pipeline = CreditScoringPipeline()
+   ```
+2. **Con `PipelineConfig`** (configuración tipada):
+   ```python
+   from creditScoring import CreditScoringPipeline, PipelineConfig
+
+   custom = PipelineConfig(model_type="random_forest", random_state=7)
+   pipeline = CreditScoringPipeline(config=custom)
+   ```
+3. **Con `dict`** (control total de secciones y valores):
+   ```python
+   from creditScoring import CreditScoringPipeline
+
+   custom = {
+       "binning": {"n_bins": 10, "method": "equal_width"},
+       "missing": {
+           "numeric_strategy": "mean",
+           "categorical_strategy": "constant",
+           "fill_value": -1,
+           "categorical_fill_value": "NA",
+       },
+       "feature_selection": {
+           "min_iv": 0.03,
+           "max_correlation": 0.75,
+           "correlation_method": "spearman",
+       },
+       "scorecard": {"pdo": 30.0, "base_score": 650.0, "base_odds": 40.0},
+       "evaluation": {"threshold": 0.45},
+       "model_type": "neural_network",
+       "random_state": 123,
+   }
+   pipeline = CreditScoringPipeline(config=custom)
+   ```
+
+### Opciones disponibles más usadas
+
+- `model_type`: `logistic`, `random_forest`, `neural_network`, `xgboost`
+- `binning.method`: `quantile`, `equal_width`, `supervised`, `monotonic`
+- `missing.numeric_strategy`: `mean`, `median`, `replace`, `drop`
+- `missing.categorical_strategy`: `mode`, `constant`, `drop`
+
+Si usas `binning.method` con `supervised` o `monotonic`, el pipeline requiere `y` durante el preprocesamiento de entrenamiento.
+
 ## Estructura de módulos
 
 - `config`: configuración por defecto y configuración tipada.

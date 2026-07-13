@@ -3,3 +3,10 @@ venv/
 
 # Archivos csv
 *.csv
+
+# Notebooks prueba
+example/tests.ipynb
+example/dev_testing.ipynb
+
+# Cache
+__pycache__/

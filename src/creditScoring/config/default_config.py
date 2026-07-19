@@ -26,13 +26,6 @@ class FeatureSelectionConfig:
 
 
 @dataclass
-class ScorecardScalingConfig:
-    pdo: float = 20.0
-    base_score: float = 600.0
-    base_odds: float = 50.0
-
-
-@dataclass
 class EvaluationConfig:
     threshold: float = 0.5
 
@@ -42,7 +35,6 @@ class PipelineConfig:
     binning: BinningConfig = field(default_factory=BinningConfig)
     missing: MissingConfig = field(default_factory=MissingConfig)
     feature_selection: FeatureSelectionConfig = field(default_factory=FeatureSelectionConfig)
-    scorecard: ScorecardScalingConfig = field(default_factory=ScorecardScalingConfig)
     evaluation: EvaluationConfig = field(default_factory=EvaluationConfig)
     model_type: str = "logistic"
     random_state: int = 42

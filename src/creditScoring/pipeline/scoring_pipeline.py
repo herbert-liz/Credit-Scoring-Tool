@@ -4,6 +4,7 @@ from copy import deepcopy
 
 import pandas as pd
 import joblib
+from sklearn.preprocessing import StandardScaler
 
 from creditScoring.config.default_config import PipelineConfig, get_default_config
 from creditScoring.evaluation.classification_metrics import classification_report_dict
@@ -18,7 +19,6 @@ from creditScoring.models import (
     XGBoostModel,
 )
 from creditScoring.preprocessing import BinningTransformer, CategoricalEncoder, WOETransformer, handle_missing_values
-from creditScoring.scorecard.scaling import ScoreScaler
 
 
 class CreditScoringPipeline:
@@ -38,13 +38,9 @@ class CreditScoringPipeline:
             n_bins=self.config["binning"]["n_bins"],
         )
         self.woe = WOETransformer()
+        self.standard_scaler = StandardScaler()
         self.iv_selector = IVFeatureSelector(min_iv=self.config["feature_selection"]["min_iv"])
         self.model = self._create_model(self.config.get("model_type", "logistic"))
-        self.scaler = ScoreScaler(
-            pdo=self.config["scorecard"]["pdo"],
-            base_score=self.config["scorecard"]["base_score"],
-            base_odds=self.config["scorecard"]["base_odds"],
-        )
         self.selected_features_: list[str] = []
         self._fitted = False
 
@@ -73,19 +69,34 @@ class CreditScoringPipeline:
             self.encoder.fit(data, y)
         data = self.encoder.transform(data)
 
-        if fit:
-            self.binner.fit(data, y)
-        if self.binner.method in {"supervised", "monotonic"}:
-            if y is None:
-                raise ValueError("y is required for supervised/monotonic preprocessing")
-            data = self.binner.transform(data, y)
-        else:
-            data = self.binner.transform(data)
+        model_type = self.config.get("model_type", "logistic")
 
-        data = data.astype(str)
-        if fit:
-            self.woe.fit(data, y)
-        data = self.woe.transform(data)
+        if model_type == "logistic":
+            # Binning + WOE transformation for logistic regression
+            if fit:
+                self.binner.fit(data, y)
+            if self.binner.method in {"supervised", "monotonic"}:
+                if y is None:
+                    raise ValueError("y is required for supervised/monotonic preprocessing")
+                data = self.binner.transform(data, y)
+            else:
+                data = self.binner.transform(data)
+
+            data = data.astype(str)
+            if fit:
+                self.woe.fit(data, y)
+            data = self.woe.transform(data)
+        elif model_type == "neural_network":
+            # StandardScaler for neural network
+            if fit:
+                self.standard_scaler.fit(data)
+            data = pd.DataFrame(
+                self.standard_scaler.transform(data),
+                columns=data.columns,
+                index=data.index,
+            )
+        # random_forest and xgboost: no additional transformation needed
+
         return data
 
     def select_features(self, X: pd.DataFrame, y: pd.Series, fit: bool = False) -> pd.DataFrame:
@@ -120,10 +131,6 @@ class CreditScoringPipeline:
         Xp = self.preprocess(X, fit=False)
         Xs = self.select_features(Xp, y=None, fit=False)
         return self.model.predict_proba(Xs)
-
-    def score(self, X: pd.DataFrame):
-        probs = self.predict_proba(X)
-        return pd.Series([self.scaler.probability_to_score(p) for p in probs], index=X.index)
 
     def evaluate(self, X: pd.DataFrame, y: pd.Series) -> ModelResults:
         probs = self.predict_proba(X)

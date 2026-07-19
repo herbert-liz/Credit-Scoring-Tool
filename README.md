@@ -30,9 +30,23 @@ y = pd.Series([1, 0, 0, 1])
 pipeline = CreditScoringPipeline()
 pipeline.fit(X, y)
 prob = pipeline.predict_proba(X)
-score = pipeline.score(X)
 results = pipeline.evaluate(X, y)
 ```
+
+## Preprocesamiento según modelo
+
+El pipeline aplica un preprocesamiento diferente según el tipo de modelo seleccionado:
+
+| `model_type` | Preprocesamiento |
+|---|---|
+| `logistic` | Encoding → Binning → WOE |
+| `neural_network` | Encoding → StandardScaler |
+| `random_forest` | Encoding (sin transformación adicional) |
+| `xgboost` | Encoding (sin transformación adicional) |
+
+- **Regresión logística:** es el único modelo que usa binning y transformación WOE. Esto permite generar variables interpretables y es el enfoque clásico de scorecards.
+- **Red neuronal (MLP):** se aplica `StandardScaler` para estandarizar las variables numéricas, lo cual mejora la convergencia del entrenamiento.
+- **Random Forest y XGBoost:** no necesitan binning ni estandarización; se entrenan directamente con las variables numéricas tal como vienen (después de encoding de categóricas e imputación de missings).
 
 ## Configurar el pipeline sin usar el config por defecto
 
@@ -66,9 +80,8 @@ results = pipeline.evaluate(X, y)
            "max_correlation": 0.75,
            "correlation_method": "spearman",
        },
-       "scorecard": {"pdo": 30.0, "base_score": 650.0, "base_odds": 40.0},
        "evaluation": {"threshold": 0.45},
-       "model_type": "neural_network",
+       "model_type": "logistic",
        "random_state": 123,
    }
    pipeline = CreditScoringPipeline(config=custom)
@@ -77,7 +90,7 @@ results = pipeline.evaluate(X, y)
 ### Opciones disponibles más usadas
 
 - `model_type`: `logistic`, `random_forest`, `neural_network`, `xgboost`
-- `binning.method`: `quantile`, `equal_width`, `supervised`, `monotonic`
+- `binning.method`: `quantile`, `equal_width`, `supervised`, `monotonic` (solo aplica para `logistic`)
 - `missing.numeric_strategy`: `mean`, `median`, `replace`, `drop`
 - `missing.categorical_strategy`: `mode`, `constant`, `drop`
 
@@ -91,6 +104,5 @@ Si usas `binning.method` con `supervised` o `monotonic`, el pipeline requiere `y
 - `feature_selection`: selección por IV y filtro de correlación.
 - `models`: wrappers para Logistic Regression, Random Forest, XGBoost y MLP.
 - `evaluation`: métricas de clasificación y crédito.
-- `scorecard`: escalamiento PDO y generación de puntos.
 - `pipeline`: flujo end-to-end de entrenamiento y scoring.
 - `visualization`: funciones de gráficas para análisis y performance.

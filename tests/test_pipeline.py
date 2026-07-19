@@ -17,9 +17,7 @@ def test_pipeline_fit_predict_evaluate():
     pipe.fit(X, y)
 
     proba = pipe.predict_proba(X)
-    scores = pipe.score(X)
     results = pipe.evaluate(X, y)
 
     assert len(proba) == len(X)
-    assert len(scores) == len(X)
     assert "roc_auc" in results.classification_metrics

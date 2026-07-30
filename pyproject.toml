@@ -6,7 +6,27 @@ authors = [{ name = "Herbert Lizama" }]
 dependencies = [
     "pandas>=3.0.0",
     "numpy>=2.4.2",
-    "scikit-learn>=1.8.0"
+    "scikit-learn>=1.8.0",
+    "joblib>=1.4.0",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Intended Audience :: Financial and Insurance Industry",
+]
+
+[project.optional-dependencies]
+viz = ["matplotlib>=3.9.0", "seaborn>=0.13.0"]
+models = ["xgboost>=2.1.0"]
+dev = ["pytest>=8.0.0", "ruff>=0.6.0"]
+all = [
+    "matplotlib>=3.9.0",
+    "seaborn>=0.13.0",
+    "xgboost>=2.1.0",
+    "pytest>=8.0.0",
+    "ruff>=0.6.0",
 ]
 
 [build-system]

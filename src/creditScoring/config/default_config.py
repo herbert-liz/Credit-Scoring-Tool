@@ -7,7 +7,8 @@ from typing import Any
 @dataclass
 class BinningConfig:
     n_bins: int = 5
-    method: str = "quantile"  # quantile|equal_width|supervised|monotonic
+    method: str = "monotonic"  # quantile|equal_width|supervised|monotonic
+    min_bin_pct: float = 0.05  # minimum percentage of training records per bin
 
 
 @dataclass

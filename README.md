@@ -35,6 +35,12 @@ results = pipeline.evaluate(X, y)
 
 ## Preprocesamiento según modelo
 
+### Binning Monotónico
+
+El **binning monotónico** es el método de discretización por defecto para la regresión logística. Consiste en agrupar los valores de una variable numérica en intervalos (bins) de tal forma que la tasa de evento (event rate) sea estrictamente creciente o decreciente a través de los bins resultantes. Esto garantiza una relación monotónica entre la variable transformada y la probabilidad de default, lo cual es un requisito fundamental para la construcción de scorecards interpretables y estables.
+
+El parámetro `min_bin_pct` (por defecto `0.05`, es decir 5%) establece el porcentaje mínimo de registros de la base de entrenamiento que debe contener cada bin para ser considerado como una categoría válida. Los bins que no alcanzan este umbral se fusionan con bins adyacentes, evitando categorías con muy pocas observaciones que podrían generar inestabilidad en el modelo.
+
 El pipeline aplica un preprocesamiento diferente según el tipo de modelo seleccionado:
 
 | `model_type` | Preprocesamiento |
@@ -90,7 +96,8 @@ El pipeline aplica un preprocesamiento diferente según el tipo de modelo selecc
 ### Opciones disponibles más usadas
 
 - `model_type`: `logistic`, `random_forest`, `neural_network`, `xgboost`
-- `binning.method`: `quantile`, `equal_width`, `supervised`, `monotonic` (solo aplica para `logistic`)
+- `binning.method`: `monotonic` (default), `quantile`, `equal_width`, `supervised` (solo aplica para `logistic`)
+- `binning.min_bin_pct`: porcentaje mínimo de registros por bin (default: `0.05`)
 - `missing.numeric_strategy`: `mean`, `median`, `replace`, `drop`
 - `missing.categorical_strategy`: `mode`, `constant`, `drop`
 

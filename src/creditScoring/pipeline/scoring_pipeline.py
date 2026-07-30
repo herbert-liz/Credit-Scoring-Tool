@@ -36,6 +36,7 @@ class CreditScoringPipeline:
         self.binner = BinningTransformer(
             method=self.config["binning"]["method"],
             n_bins=self.config["binning"]["n_bins"],
+            min_bin_pct=self.config["binning"].get("min_bin_pct", 0.05),
         )
         self.woe = WOETransformer()
         self.standard_scaler = StandardScaler()
@@ -75,9 +76,7 @@ class CreditScoringPipeline:
             # Binning + WOE transformation for logistic regression
             if fit:
                 self.binner.fit(data, y)
-            if self.binner.method in {"supervised", "monotonic"}:
-                if y is None:
-                    raise ValueError("y is required for supervised/monotonic preprocessing")
+            if self.binner.method in {"supervised", "monotonic"} and fit:
                 data = self.binner.transform(data, y)
             else:
                 data = self.binner.transform(data)

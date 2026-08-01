@@ -3,7 +3,7 @@ import pandas as pd
 from creditScoring.pipeline import CreditScoringPipeline
 
 
-def test_pipeline_fit_predict_evaluate():
+def test_pipeline_fit_predict():
     X = pd.DataFrame(
         {
             "income": [1000, 1200, 900, 2500, 1900, 2100, 800, 1300],
@@ -17,7 +17,5 @@ def test_pipeline_fit_predict_evaluate():
     pipe.fit(X, y)
 
     proba = pipe.predict_proba(X)
-    results = pipe.evaluate(X, y)
 
     assert len(proba) == len(X)
-    assert "roc_auc" in results.classification_metrics

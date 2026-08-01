@@ -7,9 +7,6 @@ import joblib
 from sklearn.preprocessing import StandardScaler
 
 from creditScoring.config.default_config import PipelineConfig, get_default_config
-from creditScoring.evaluation.classification_metrics import classification_report_dict
-from creditScoring.evaluation.credit_metrics import gini_coefficient, ks_statistic
-from creditScoring.evaluation.results import ModelResults
 from creditScoring.feature_selection.correlation import remove_correlated_features
 from creditScoring.feature_selection.iv_selection import IVFeatureSelector
 from creditScoring.models import (
@@ -130,16 +127,6 @@ class CreditScoringPipeline:
         Xp = self.preprocess(X, fit=False)
         Xs = self.select_features(Xp, y=None, fit=False)
         return self.model.predict_proba(Xs)
-
-    def evaluate(self, X: pd.DataFrame, y: pd.Series) -> ModelResults:
-        probs = self.predict_proba(X)
-        threshold = self.config["evaluation"]["threshold"]
-        cls = classification_report_dict(y, probs, threshold=threshold)
-        credit = {
-            "ks": ks_statistic(y, probs),
-            "gini": gini_coefficient(y, probs),
-        }
-        return ModelResults(classification_metrics=cls, credit_metrics=credit, metadata={"threshold": threshold})
 
     def save(self, path: str) -> None:
         joblib.dump(self, path)

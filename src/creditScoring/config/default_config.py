@@ -27,16 +27,10 @@ class FeatureSelectionConfig:
 
 
 @dataclass
-class EvaluationConfig:
-    threshold: float = 0.5
-
-
-@dataclass
 class PipelineConfig:
     binning: BinningConfig = field(default_factory=BinningConfig)
     missing: MissingConfig = field(default_factory=MissingConfig)
     feature_selection: FeatureSelectionConfig = field(default_factory=FeatureSelectionConfig)
-    evaluation: EvaluationConfig = field(default_factory=EvaluationConfig)
     model_type: str = "logistic"
     random_state: int = 42
 

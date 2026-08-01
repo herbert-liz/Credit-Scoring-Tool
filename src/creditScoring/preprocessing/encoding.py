@@ -9,7 +9,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 class CategoricalEncoder(BaseEstimator, TransformerMixin):
     """Scikit-learn compatible categorical encoder."""
 
-    def __init__(self, method: Literal["label", "onehot", "frequency"] = "onehot"):
+    def __init__(self, method: Literal["target", "onehot", "frequency"] = "target"):
         self.method = method
         self.columns_: list[str] = []
         self.mapping_: dict[str, dict] = {}
@@ -17,13 +17,16 @@ class CategoricalEncoder(BaseEstimator, TransformerMixin):
     def fit(self, X: pd.DataFrame, y=None):
         X = X.copy()
         self.columns_ = X.select_dtypes(exclude=["number"]).columns.tolist()
-        if self.method in {"label", "frequency"}:
+        if self.method == "frequency":
             for col in self.columns_:
-                if self.method == "label":
-                    categories = X[col].astype("category").cat.categories
-                    self.mapping_[col] = {cat: idx for idx, cat in enumerate(categories)}
-                else:
-                    self.mapping_[col] = X[col].value_counts(normalize=True, dropna=False).to_dict()
+                self.mapping_[col] = X[col].value_counts(normalize=True, dropna=False).to_dict()
+        elif self.method == "target":
+            if y is None:
+                raise ValueError("Target encoding requires y to be provided during fit.")
+            y_series = pd.Series(y, index=X.index)
+            self.global_mean_ = y_series.mean()
+            for col in self.columns_:
+                self.mapping_[col] = y_series.groupby(X[col]).mean().to_dict()
         return self
 
     def transform(self, X: pd.DataFrame):
@@ -33,12 +36,14 @@ class CategoricalEncoder(BaseEstimator, TransformerMixin):
 
         for col in self.columns_:
             mapping = self.mapping_.get(col, {})
-            if self.method == "label":
-                X[col] = X[col].map(mapping).fillna(-1).astype(int)
-            elif self.method == "frequency":
+            if self.method == "frequency":
                 X[col] = X[col].map(mapping).fillna(0.0)
+            elif self.method == "target":
+                X[col] = X[col].map(mapping).fillna(self.global_mean_)
             else:
                 raise ValueError(
-                    f"Unsupported encoding method: {self.method}. Supported methods: label, onehot, frequency"
+                    f"Unsupported encoding method: {self.method}. "
+                    f"Supported methods: target, onehot, frequency"
                 )
         return X
+

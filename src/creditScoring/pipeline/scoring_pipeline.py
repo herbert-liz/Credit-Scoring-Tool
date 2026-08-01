@@ -29,7 +29,7 @@ class CreditScoringPipeline:
         else:
             self.config = deepcopy(config)
 
-        self.encoder = CategoricalEncoder(method="frequency")
+        self.encoder = CategoricalEncoder(method="target")
         self.binner = BinningTransformer(
             method=self.config["binning"]["method"],
             n_bins=self.config["binning"]["n_bins"],
